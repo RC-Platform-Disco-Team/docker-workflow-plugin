@@ -252,6 +252,7 @@ public class DockerClient {
 
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.log(Level.FINE, "Executing docker command {0}", args.toString());
+            LOGGER.log(Level.FINE, "ENV: " + launchEnv.toString());
         }
 
         Launcher.ProcStarter procStarter = launcher.launch();
@@ -332,14 +333,18 @@ public class DockerClient {
      */
     public List<String> getVolumes(@Nonnull EnvVars launchEnv, String containerID) throws IOException, InterruptedException {
         LaunchResult result = launch(launchEnv, true, "inspect", "-f", "{{range .Mounts}}{{.Destination}}\n{{end}}", containerID);
+        LOGGER.info("Status" + result.getStatus() +  " Out: " + result.getOut() + " Error: " + result.getErr());
         if (result.getStatus() != 0) {
+            LOGGER.info("No volumes found as status = " + result.getStatus());
             return Collections.emptyList();
         }
 
         String volumes = result.getOut();
         if (volumes.isEmpty()) {
+            LOGGER.info("No volumes found as out is empty");
             return Collections.emptyList();
         }
+        LOGGER.info("Found volumes: " + volumes);
         return Arrays.asList(volumes.split("\\n"));
     }
 }
