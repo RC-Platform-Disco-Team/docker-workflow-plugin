@@ -150,7 +150,7 @@ public class WithContainerStep extends AbstractStepImpl {
             Optional<String> containerId = dockerClient.getContainerIdIfContainerized();
             if (containerId.isPresent()) {
                 LOGGER.info("Inside container");
-                final Collection<String> mountedVolumes = dockerClient.getVolumes(envHost, containerId.get());
+                final Collection<String> mountedVolumes = dockerClient.getVolumes(env, containerId.get());
                 final String[] dirs = {ws, tmp};
                 for (String dir : dirs) {
                     LOGGER.info("Checking dir " + dir);
@@ -182,7 +182,7 @@ public class WithContainerStep extends AbstractStepImpl {
             DockerFingerprints.addRunFacet(dockerClient.getContainerRecord(env, container), run);
             ImageAction.add(step.image, run);
             getContext().newBodyInvoker().
-                    withContext(BodyInvoker.mergeLauncherDecorators(getContext().get(LauncherDecorator.class), new Decorator(container, envHost, ws, toolName))).
+                    withContext(BodyInvoker.mergeLauncherDecorators(getContext().get(LauncherDecorator.class), new Decorator(container, env, ws, toolName))).
                     withCallback(new Callback(container, toolName)).
                     start();
             return false;
